@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        // variable = value 
         IMAGE_BACKEND = 'todo-backend'
         IMAGE_FRONTEND = 'todo-frontend'
         MAIL_TO = 'abhiranjank037@gmail.com'
@@ -8,11 +9,11 @@ pipeline {
 
     stages {
 
-        stage("Entry"){
-            steps{
-                echo "This is entry point"
-            }
-        }
+        // stage("Entry"){
+        //     steps{
+        //         echo "This is entry point"
+        //     }
+        // }
         stage('Stop and Remove Containers') {
             steps {
                 bat '''
