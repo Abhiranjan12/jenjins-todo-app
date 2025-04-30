@@ -1,85 +1,42 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds-id') // Make sure this ID matches Jenkins credentials
-        DOCKERHUB_USERNAME = 'aabhijeet097'
-        IMAGE_BACKEND = "${DOCKERHUB_USERNAME}/todo-backend"
-        IMAGE_FRONTEND = "${DOCKERHUB_USERNAME}/todo-frontend"
-        MAIL_TO = 'aks1perman@gmail.com'
+        IMAGE_BACKEND = 'todo-backend'
+        IMAGE_FRONTEND = 'todo-frontend'
+        MAIL_TO = 'abhiranjank037@gmail.com'
     }
-    
+
     stages {
-        stage('Backup Code') {
-            steps {
-                sh '''
-                    timestamp=$(date +"%Y%m%d_%H%M%S")
-                    mkdir -p backups
-                    zip -r backups/backup_$timestamp.zip .
-                '''
-            }
-        }
-        
         stage('Stop and Remove Containers') {
             steps {
-                sh '''
-                    docker compose down || true
+                bat '''
+                docker-compose down || exit /b 0
                 '''
             }
         }
 
         stage('Remove Old Images') {
             steps {
-                sh '''
-                    docker rmi $IMAGE_BACKEND || true
-                    docker rmi $IMAGE_FRONTEND || true
+                bat '''
+                docker rmi %IMAGE_BACKEND% || exit /b 0
+                docker rmi %IMAGE_FRONTEND% || exit /b 0
                 '''
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                script {
-                    sh 'docker compose build'
-                }
+                bat 'docker-compose build'
             }
         }
-
-        // stage('Login to Docker Hub') {
-        //     steps {
-        //         script {
-        //             sh """
-        //                 echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
-        //             """
-        //         }
-        //     }
-        // }
-
-        stage('tagging the image') {
-            steps {
-                sh '''
-                    docker tag todo-backend $IMAGE_BACKEND
-                    docker tag todo-frontend $IMAGE_FRONTEND
-                '''
-            }
-        }
-
-        // stage('Push Docker Images') {
-        //     steps {
-        //         sh '''
-        //             docker push $IMAGE_BACKEND
-        //             docker push $IMAGE_FRONTEND
-        //         '''
-        //     }
-        // }
 
         stage('Start Containers') {
             steps {
-                sh 'docker compose up -d'
+                bat 'docker compose up -d'
             }
         }
-        
     }
-    
+
     post {
         success {
             mail to: "${MAIL_TO}",
@@ -93,3 +50,4 @@ pipeline {
         }
     }
 }
+3
