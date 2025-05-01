@@ -9,11 +9,11 @@ pipeline {
 
     stages {
 
-        stage("Entry"){
-            steps{
-                echo "This is entry point"
-            }
-        }
+        // stage("Entry"){
+        //     steps{
+        //         echo "This is entry point"
+        //     }
+        // }
         stage('Stop and Remove Containers') {
             steps {
                 bat '''
